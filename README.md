@@ -1,9 +1,9 @@
 # CUTE-lang
-## "C Unified Transpiled Environment Language"
+## "C Unified Transpiled Environment language"
 
-C.U.T.E is a scripting language designed for simple integration into C environments, hence the abbreviation.
+C.U.T.E is a scripting language designed for simple integration into C++ environments, hence the abbreviation.
 
-Instead of compiling to C(++)-interopable bytecode, like languages such as Lua, CUTE compiles directly to C and supports more extensible and advanced project and management files.
+Instead of compiling to C(++)-compatible bytecode, like languages such as Lua, CUTE compiles directly to C and supports more extensible and advanced project and management files.
 
 ## Why does CUTE exist?
 CUTE is built to be integrated within a game engine environment and provides a lightweight alternative to traditional scripting solutions.
@@ -11,7 +11,7 @@ CUTE is built to be integrated within a game engine environment and provides a l
 Instead of embedding a full interpreter or virtual machine, CUTE generates native C-compatible code that can be compiled directly into the host application. This allows engine developers to maintain full control over memory, performance, and execution flow while still providing a flexible scripting layer for gameplay logic.
 
 ## Design goals of CUTE
-1. **Minimal runtime overhead.** - No embedded interpreter or virtual machine required, only the transpiler.
+1. **Minimal runtime overhead.** - No embedded interpreter or virtual machine required, only the transpiled code.
 2. **Native integration.** - Outputs native C++ source code or header files.
 3. **Customizable execution model.** - Can use a standard `main` entry point or use a different C stub for execution.
 
@@ -27,10 +27,12 @@ version = "0.1.0"
 [source]
 dir = "src/"
 entrypoint = "src/main.cute"
-stub = "standard" # Can be any C++ file or "standard"
+stub = "standard" # Built-in stub or path to a custom C++ stub
+cpp_includes = ["<string>", "<iostream>"]
 
 [build]
 output = "build/"
+compiler = "g++"
 ```
 
 ## Current status
