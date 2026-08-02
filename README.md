@@ -27,7 +27,7 @@ version = "0.1.0"
 [source]
 dir = "src/"
 entrypoint = "src/main.cute"
-hpp = False
+header = False
 
 [build]
 output = "build/"

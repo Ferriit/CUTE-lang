@@ -24,6 +24,7 @@ int main() {
     std::string data;
     int status = read_file("cute.toml", data);
 
+    std::cout << data << std::endl;
     return 0;
 }
 
