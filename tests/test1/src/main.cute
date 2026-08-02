@@ -1,0 +1,10 @@
+class Program {
+    public func Program() {
+        print("Starting program");
+    }
+
+    public func add(a: int, b: int) {
+        var res: int = a + b;
+        return res;
+    }
+}

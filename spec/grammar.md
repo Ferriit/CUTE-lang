@@ -41,8 +41,10 @@ var x: int = 5;
 The following identifiers are reserved:
 
 ```text
+using
 namespace
 class
+inherits
 struct
 enum
 func
@@ -176,6 +178,12 @@ Examples:
 var health: int;
 var name: string;
 var active: bool;
+```
+
+However, some have been remapped with other keywords
+```cute
+var lines: list string; # Same as "std::vector<std::string> list;"
+var lines_arr: arr string 50; # Same as "std::vector<std::string, 50> list_arr;"
 ```
 
 User-defined types are created with:
@@ -336,7 +344,7 @@ Classes behave like C++ classes.
 Syntax:
 
 ```text
-class name {
+class name [inherits] [other class] {
     members
 };
 ```
@@ -344,7 +352,7 @@ class name {
 Example:
 
 ```cute
-class Player {
+class Player inherits Entity {
     private var health: int;
 
     public func damage(amount: int): void {
@@ -501,6 +509,8 @@ Supported operators include:
 *
 /
 %
+>>
+<<
 ```
 
 ## Comparison
@@ -537,6 +547,8 @@ Supported operators include:
 -=
 *=
 /=
+>>=
+<<=
 ```
 
 Operator precedence follows C23.
@@ -551,6 +563,8 @@ Syntax:
 
 ```text
 if (condition) {
+}
+else if (condition) {
 }
 else {
 }
@@ -592,7 +606,7 @@ CUTE adds a range-based loop syntax.
 Example:
 
 ```cute
-for (var i <- range(0, 10)) {
+for (var i -> range(0, 10)) {
     print(i);
 }
 ```
@@ -657,18 +671,12 @@ identifier:
 
 # Imports
 
-Imports are not written inside CUTE source files.
-
-Dependencies are managed using `cute.toml`.
+Imports are handled through the `using` keyword and a name that works the same as in C++.
 
 Example:
 
-```toml
-[source]
-cpp_includes = ["<string>", "<iostream>"]
-
-[dependencies]
-library = "1.0"
+```cute
+using <iostream>
 ```
 
 The build system handles translation into C++ includes and dependencies.
