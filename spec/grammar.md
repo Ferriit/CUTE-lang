@@ -31,7 +31,7 @@ Example:
 ```cute
 # This is a comment
 
-var x: int = 5;
+var x: i32 = 5;
 ```
 
 ---
@@ -61,6 +61,36 @@ run
 jump
 true
 false
+```
+
+So are these variable types:
+```text
+void
+bool
+iptr
+uptr
+i8
+i16
+i32
+i64
+u8
+u16
+u32
+u64
+f32
+f64
+char
+c16
+c32
+err
+
+string
+stringview
+list
+map
+tuple
+optional
+result
 ```
 
 ---
@@ -101,43 +131,26 @@ Syntax:
 var name [: type] [= value];
 ```
 
-A variable must have either:
+A variable must have:
 
 * a type declaration
 * an initial value
-* both
 
 Valid:
 
 ```cute
-var x: int = 5;
-var y = 5;
-var z: int;
+var x: i32 = 5;
+var y: f64 = 5.0;
+var z: i64;
 ```
 
 Invalid:
 
 ```cute
 x = 5;
-int y = 5;
+i32 y = 5;
 var z;
 ```
-
-When the type is omitted, CUTE uses type inference.
-
-Example:
-
-```cute
-var value = 10;
-```
-
-Equivalent:
-
-```cute
-var value: int = 10;
-```
-
----
 
 # Constants
 
@@ -154,7 +167,7 @@ const name: type = value;
 Valid:
 
 ```cute
-const max_players: int = 16;
+const max_players: i32 = 16;
 const title: string = "CUTE";
 ```
 
@@ -170,12 +183,100 @@ Constants cannot be reassigned.
 
 # Types
 
-CUTE supports normal C++ types.
+The following is a list over all variable types and what C++ types they match to:
+
+```text
+void - void
+bool - bool
+iptr - intptr_t
+uptr - uintptr_t
+i8 - int8_t
+i16 - int16_t
+i32 - int32_t
+i64 - int64_t
+u8 - uint8_t
+u16 - uint16_t
+u32 - uint32_t
+u64 - uint64_t
+f32 - float
+f64 - double
+char - char
+c16 - char16_t
+c32 - char32_t
+err - uint8_t
+
+string - std::string
+stringview - std::string_view
+list T - std::vector<T>
+map K V - std::unordered_map<K, V>
+tuple T1 T2 T3 T4 [...] std::tuple<T1, T2, T3, T4, ...>
+optional T - std::optional<T>
+result T - cute::result<T>
+```
+
+`cute::result<T>` is defined in C++ as:
+
+```c++
+namespace cute {
+template <typename T>
+class result {
+    std::optional<T> value;
+    uint8_t err = 255;
+
+public:
+    bool exists() const {
+        return value.has_value();
+    }
+
+    uint8_t get_err() const {
+        return err;
+    }
+
+    T& unwrap() & {
+        if (!value)
+            cute::panic("Tried unwrapping non-existent value");
+
+        return *value;
+    }
+
+    const T& unwrap() const & {
+        if (!value)
+            cute::panic("Tried unwrapping non-existent value");
+
+        return *value;
+    }
+
+    T&& unwrap() && {
+        if (!value)
+            cute::panic("Tried unwrapping non-existent value");
+
+        return std::move(*value);
+    }
+
+    T expect(std::string_view message) const {
+        if (!value)
+            cute::panic(std::string(message));
+
+        return *value;
+    }
+
+    void set_error(uint8_t e) {
+        value.reset();
+        err = e;
+    }
+
+    void set_val(T val) {
+        value = std::move(val);
+        err = 255;
+    }
+};
+}
+```
 
 Examples:
 
 ```cute
-var health: int;
+var health: i32;
 var name: string;
 var active: bool;
 ```
@@ -183,7 +284,7 @@ var active: bool;
 However, some have been remapped with other keywords
 ```cute
 var lines: list string; # Same as "std::vector<std::string> list;"
-var lines_arr: arr string 50; # Same as "std::vector<std::string, 50> list_arr;"
+var lines_arr: string[50]; # Same as "string lines_arr[50];"
 ```
 
 User-defined types are created with:
@@ -191,6 +292,8 @@ User-defined types are created with:
 * `struct`
 * `class`
 * `enum`
+
+They also follow the same syntax as C++
 
 Example:
 
@@ -592,7 +695,7 @@ CUTE supports C-style for loops.
 Example:
 
 ```cute
-for (var i = 0; i < 10; i++) {
+for (var i: int = 0; i < 10; i++) {
     print(i);
 }
 ```
@@ -606,7 +709,7 @@ CUTE adds a range-based loop syntax.
 Example:
 
 ```cute
-for (var i -> range(0, 10)) {
+for (var i: int -> range(0, 10)) {
     print(i);
 }
 ```
