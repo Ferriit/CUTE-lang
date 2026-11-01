@@ -31,6 +31,7 @@ The following options are supported:
 * `-s` requests static linking for the compiled output.
 * `-S` displays the intermediate compilation stages produced by the compiler,
   such as generated C++ source and assembly.
+* `-h` compiles the source to a C++ header file rather than a C++ source.
 * `--` ends CUTE option parsing. Every argument after it is passed directly to
   the C++ compiler and is not interpreted as a CUTE compiler option.
 

@@ -2,5 +2,26 @@
 name = "cutec"
 version = "0.1.0"
 edition = "2024"
+authors = ["Ferriit"]
+description = "Gamedev-centered programming language that can transpile to C++ source and header files."
+license = "MIT"
+repository = "https://git.ferriit.eu/ferriit/CUTE-lang"
+readme = "README.md"
+keywords = [
+    "compiler",
+    "programming-language",
+    "language",
+    "code-generation",
+    "toolchain"
+]
+categories = [
+    "development-tools",
+    "compilers",
+    "command-line-utilities"
+]
+
+[[bin]]
+name = "cutec"
+path = "src/main.rs"
 
 [dependencies]
