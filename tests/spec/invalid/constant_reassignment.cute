@@ -1,0 +1,2 @@
+const max_players: i32 = 16;
+max_players = 32;

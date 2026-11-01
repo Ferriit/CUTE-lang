@@ -17,6 +17,29 @@ This document only describes CUTE-specific syntax.
 
 ---
 
+# Compiler command line
+
+The compiler is invoked with a CUTE source file and optional compiler flags:
+
+```text
+cutec [options] <source.cute> [-- <cpp-compiler-arguments...>]
+```
+
+The following options are supported:
+
+* `-o <file>` writes the compiled output to `<file>`.
+* `-s` requests static linking for the compiled output.
+* `-S` displays the intermediate compilation stages produced by the compiler,
+  such as generated C++ source and assembly.
+* `--` ends CUTE option parsing. Every argument after it is passed directly to
+  the C++ compiler and is not interpreted as a CUTE compiler option.
+
+For example, `cutec -s -o game src/game.cute -- -O2 -Wall` requests a
+statically linked output named `game`, with `-O2` and `-Wall` passed to the
+C++ compiler.
+
+---
+
 # Miscellaneous
 
 * All statements must end with `;`.

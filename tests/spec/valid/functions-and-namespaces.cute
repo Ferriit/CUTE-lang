@@ -1,0 +1,16 @@
+namespace math {
+    func add(a: i32, b: i32): i32 {
+        return a + b;
+    }
+
+    func log_result(value: i32): void {
+        print(value);
+        return;
+    }
+};
+
+func main(): i32 {
+    var total: i32 = math.add(2, 3);
+    math.log_result(total);
+    return 0;
+}

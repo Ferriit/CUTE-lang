@@ -1,0 +1,20 @@
+const max_players: i32 = 16;
+const title: string = "CUTE";
+
+var enabled: bool = true;
+var signed_byte: i8 = -1;
+var signed_short: i16 = 2;
+var signed_int: i32 = 3;
+var signed_long: i64 = 4;
+var unsigned_byte: u8 = 5;
+var unsigned_short: u16 = 6;
+var unsigned_int: u32 = 7;
+var unsigned_long: u64 = 8;
+var single_precision: f32 = 1.5;
+var double_precision: f64 = 2.5;
+var character: char = 'c';
+var utf16_character: c16 = 'c';
+var utf32_character: c32 = 'c';
+var error_code: err = 0;
+var name: string = "player";
+var view: stringview = "read-only";

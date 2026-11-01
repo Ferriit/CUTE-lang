@@ -1,0 +1,45 @@
+struct Vector {
+    var x: f32 = 0.0;
+    var y: f32 = 0.0;
+
+    func length(): f32 {
+        return 0.0;
+    }
+};
+
+class Entity {
+    public func update(): void {
+        return;
+    }
+};
+
+class Player inherits Entity {
+    private var health: i32 = 100;
+
+    Player() {
+    }
+
+    ~Player() {
+    }
+
+    public func get_health(): i32 {
+        return health;
+    }
+};
+
+enum State {
+    Idle,
+    Running,
+    Dead
+};
+
+enum Error {
+    None = 0,
+    Failed = 1
+};
+
+func inspect(player: Player, vector: Vector): i32 {
+    player.update();
+    vector.x;
+    return player.get_health();
+}

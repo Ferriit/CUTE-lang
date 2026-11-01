@@ -1,0 +1,4 @@
+var player: i32 = 1;
+var Player: i32 = 2;
+var player2: i32 = 3;
+var _internal: i32 = 4;
