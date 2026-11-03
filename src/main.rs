@@ -1,3 +1,5 @@
+mod lexer;
+
 const VERSION: &str = concat!("v", env!("CARGO_PKG_VERSION"));
 const LICENSE: &str = env!("CARGO_PKG_LICENSE");
 const NAME: &str = "cutec";
@@ -20,6 +22,7 @@ struct Args {
     header: bool,
     cpp_args: Vec<String>
 }
+
 
 fn print_version() {
     println!("{} {}", NAME, VERSION);
