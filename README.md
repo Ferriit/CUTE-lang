@@ -1,5 +1,5 @@
 # CUTE-lang
-## "C Unified Transpiled Environment language"
+## "C++ Unified Transpiled Environment language"
 
 C.U.T.E is a scripting language designed for simple integration into C++ environments, hence the abbreviation.
 
@@ -15,23 +15,6 @@ Instead of embedding a full interpreter or virtual machine, CUTE generates nativ
 2. **Native integration.** - Outputs native C++ source code or header files.
 3. **Customizable execution model.** - Can use a standard `main` entry point or use a different C stub for execution.
 
-## Project configuration
-CUTE projects are defined using a `cute.toml` file, which specifies source directories, output targets and C++ compiler.
-
-example:
-```toml
-[project]
-name = "test"
-version = "0.1.0"
-
-[source]
-dir = "src/"
-entrypoint = "src/main.cute"
-
-[build]
-output = "build/"
-compiler = "g++"
-```
 
 ## Current status
 CUTE is still in early development. The language design, compiler behavior, and runtime interface are subject to change as the project evolves.

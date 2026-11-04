@@ -1,3 +1,5 @@
+use std::fs;
+
 mod lexer;
 
 const VERSION: &str = concat!("v", env!("CARGO_PKG_VERSION"));
@@ -135,4 +137,9 @@ fn main() {
             std::process::exit(1);
         }
     };
+
+    let code = fs::read_to_string(args.source[0].clone())
+        .expect("cutec: Failed to read file");
+
+    lexer::tokenize(code);
 }
