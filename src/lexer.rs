@@ -1,3 +1,6 @@
+use std::fmt;
+
+
 #[allow(dead_code)]
 pub enum Lexeme {
     KeyW(String),
@@ -24,12 +27,41 @@ pub enum Lexeme {
     Eof,
 }
 
+impl fmt::Display for Lexeme {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Lexeme::KeyW(v) => write!(f, "Keyword({})", v),
+            Lexeme::Iden(v) => write!(f, "Identifier({})", v),
+            Lexeme::Op(v) => write!(f, "Operator({})", v),
+            Lexeme::Int(v) => write!(f, "Integer({})", v),
+            Lexeme::Float(v) => write!(f, "Float({:?})", v),
+            Lexeme::Char(v) => write!(f, "Char('{}')", v),
+            Lexeme::Bool(v) => write!(f, "Bool({})", v),
+            Lexeme::StringLit(v) => write!(f, "String(\"{}\")", v),
+
+            Lexeme::Semicolon => write!(f, "Semicolon"),
+            Lexeme::Colon => write!(f, "Colon"),
+            Lexeme::Comma => write!(f, "Comma"),
+            Lexeme::Dot => write!(f, "Dot"),
+
+            Lexeme::LBrace => write!(f, "LBrace"),
+            Lexeme::RBrace => write!(f, "RBrace"),
+            Lexeme::LParen => write!(f, "LParen"),
+            Lexeme::RParen => write!(f, "RParen"),
+            Lexeme::LSquare => write!(f, "LSquare"),
+            Lexeme::RSquare => write!(f, "RSquare"),
+
+            Lexeme::Eof => write!(f, "Eof"),
+        }
+    }
+}
+
 #[allow(dead_code)]
 pub struct Token {
-    lex: Lexeme,
-    line: usize,
-    column: usize,
-    width: usize
+    pub lex: Lexeme,
+    pub line: usize,
+    pub column: usize,
+    pub width: usize
 }
 
 fn clean_code(code: String) -> String {

@@ -141,5 +141,8 @@ fn main() {
     let code = fs::read_to_string(args.source[0].clone())
         .expect("cutec: Failed to read file");
 
-    lexer::tokenize(code);
+    let tokens = lexer::tokenize(code);
+    for tok in tokens {
+        println!("{}:{}\t {}", tok.line, tok.column, tok.lex);
+    }
 }
