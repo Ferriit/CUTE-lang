@@ -124,92 +124,71 @@ pub fn clean_code(code: String) -> String {
 }
 
 fn tok_to_lexeme(token: String) -> Lexeme {
-    let keywords: Vec<&str> = vec![
-        "using",
-        "namespace",
-        "class",
-        "inherits",
-        "struct",
-        "enum",
-        "func",
-        "var",
-        "const",
-        "public",
-        "private",
-        "return",
-        "if",
-        "else",
-        "for",
-        "while",
-        "run",
-        "jump",
-        "true",
-        "false",
+    let keywords = [
+        "using", "namespace", "class", "inherits", "struct",
+        "enum", "func", "var", "const", "public", "private",
+        "return", "if", "else", "for", "while", "run", "jump"
     ];
 
-    let operators: Vec<&str> = vec![
-        ">>",
-        "<<",
-        "+",
-        "-",
-        "*",
-        "/",
-        "%",
-        "^",
-        "&",
-        "|",
-        "==",
-        "!=",
-        "&&",
-        "||",
-
-        "=",
-        ">>=",
-        "<<=",
-        "+=",
-        "-=",
-        "*=",
-        "/=",
-        "%=",
-        "^=",
-        "&=",
-        "|=",
+    let operators = [
+        ">>", "<<", ">>>",
+        "+", "-", "*", "/", "%", "^", "&", "|",
+        "==", "!=", "&&", "||",
+        "=", ">>=", "<<=", ">>>=",
+        "+=", "-=", "*=", "/=", "%=", "^=", "&=", "|=",
+        ">", "<", ">=", "<=", "!", "~"
     ];
-    
+
+    if token.is_empty() {
+        panic!("Attempted to convert an empty token");
+    }
+
     if keywords.contains(&token.as_str()) {
         Lexeme::KeyW(token)
-    }
-    else if operators.contains(&token.as_str()) {
-        Lexeme::Op(token)
-    }
-    else if token.as_bytes()[0] == b'"' {
-        Lexeme::StringLit(token)
-    }
-    else if token.as_bytes()[0] == b'\'' {
-        Lexeme::Char(token.as_bytes()[0] as char)
-    }
-    else if token.parse::<i64>().is_ok() {
-        Lexeme::Int(token.parse::<i64>().unwrap())
-    }
-    else if token.parse::<f64>().is_ok() {
-        Lexeme::Float(token.parse::<f64>().unwrap())
     }
     else if token == "true" || token == "false" {
         Lexeme::Bool(token == "true")
     }
-    else {
-        match token.as_bytes()[0] as char {
-            ';' => Lexeme::Semicolon,
-            ':' => Lexeme::Colon,
-            ',' => Lexeme::Comma,
-            '.' => Lexeme::Dot,
+    else if operators.contains(&token.as_str()) {
+        Lexeme::Op(token)
+    }
+    else if token.starts_with('"') {
+        Lexeme::StringLit(token)
+    }
+    else if token.starts_with('\'') {
+        let value = &token[1..token.len() - 1];
+        let ch = match value {
+            "\\n" => '\n',
+            "\\t" => '\t',
+            "\\r" => '\r',
+            "\\0" => '\0',
+            "\\\\" => '\\',
+            "\\'" => '\'',
+            _ => value.chars().next().unwrap()
+        };
 
-            '(' => Lexeme::LParen,
-            ')' => Lexeme::RParen,
-            '[' => Lexeme::LSquare,
-            ']' => Lexeme::RSquare,
-            '{' => Lexeme::LBrace,
-            '}' => Lexeme::RBrace,
+        Lexeme::Char(ch)
+    }
+    else if let Ok(value) = token.parse::<i64>() {
+        Lexeme::Int(value)
+    }
+    else if let Ok(value) = token.parse::<f64>() {
+        Lexeme::Float(value)
+    }
+    else {
+        match token.as_str() {
+            ";" => Lexeme::Semicolon,
+            ":" => Lexeme::Colon,
+            "," => Lexeme::Comma,
+            "." => Lexeme::Dot,
+
+            "(" => Lexeme::LParen,
+            ")" => Lexeme::RParen,
+            "[" => Lexeme::LSquare,
+            "]" => Lexeme::RSquare,
+            "{" => Lexeme::LBrace,
+            "}" => Lexeme::RBrace,
+
             _ => Lexeme::Iden(token)
         }
     }
@@ -222,10 +201,15 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
         '[', ']', '(', ')', '{', '}'
     ];
 
-    let delim_cont = ['&', '|', '>', '<'];
-
-    let equals_cont = [
-        '+', '-', '*', '%', '<', '>', '=', '!'
+    let operators = [
+        ">>>=", ">>=", "<<=",
+        "==", "!=", ">=", "<=",
+        "&&", "||", ">>", "<<",
+        "+=", "-=", "*=", "/=", "%=",
+        "^=", "&=", "|=",
+        "++", "--", "->", "::",
+        "+", "-", "*", "/", "%", "^",
+        "&", "|", "=", ">", "<", "!", "~"
     ];
 
     let mut tok_str = String::new();
@@ -295,7 +279,8 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
 
         // NORMAL CHARACTERS
         if !delims.contains(&c.1)
-            || (c.1 == '.' && tok_str.chars().all(|x| x.is_ascii_digit()))
+            || (c.1 == '.' && !tok_str.is_empty()
+                && tok_str.chars().all(|x| x.is_ascii_digit()))
         {
             tok_str.push(c.1);
             pos = c.0 + c.1.len_utf8();
@@ -304,27 +289,25 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
 
         // FIRST DELIMITER
         if tok_str.is_empty() {
-            tok_str.push(c.1);
-            pos = c.0 + c.1.len_utf8();
+            let mut matched = String::new();
 
-            // Determine which characters can follow this operator
-            let continuations: &[char] = if c.1 == '=' {
-                &equals_cont
-            } else if delim_cont.contains(&c.1) {
-                &delim_cont
-            } else {
-                &[]
-            };
-
-            // Consume additional operator characters
-            while let Some(&next) = chars.peek() {
-                if continuations.contains(&next.1) {
-                    let next = chars.next().unwrap();
-                    tok_str.push(next.1);
-                    pos = next.0 + next.1.len_utf8();
-                } else {
-                    break;
+            for op in operators {
+                if code.starts_with(op) && op.len() > matched.len() {
+                    matched = op.to_string();
                 }
+            }
+
+            if !matched.is_empty() {
+                tok_str = matched;
+                pos = c.0 + tok_str.len();
+
+                // Consume remaining characters of the operator
+                for _ in 1..tok_str.chars().count() {
+                    chars.next();
+                }
+            } else {
+                tok_str.push(c.1);
+                pos = c.0 + c.1.len_utf8();
             }
         }
 
@@ -346,34 +329,62 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
 }
 
 pub fn tokenize(code: String) -> Vec<Token> {
-    // Clean code of comments and empty line endings
     let clean = clean_code(code);
-    
+
     let mut tokens: Vec<Token> = Vec::new();
     let mut line = 1;
     let mut column = 1;
 
-    let mut remaining: String = clean.clone();
+    let mut remaining = clean;
+
     while !remaining.is_empty() {
-        let old_remaining = remaining.clone();
-        let (new_remaining, token) = add_token(old_remaining, line, column);
-        
+        // Consume leading whitespace
+        let whitespace_len = remaining
+            .char_indices()
+            .take_while(|(_, c)| c.is_ascii_whitespace())
+            .map(|(i, c)| i + c.len_utf8())
+            .last()
+            .unwrap_or(0);
+
+        if whitespace_len > 0 {
+            let whitespace = &remaining[..whitespace_len];
+
+            for c in whitespace.chars() {
+                if c == '\n' {
+                    line += 1;
+                    column = 1;
+                } else {
+                    column += 1;
+                }
+            }
+
+            remaining = remaining[whitespace_len..].to_string();
+        }
+
+        if remaining.is_empty() {
+            break;
+        }
+
+        let (new_remaining, token) =
+            add_token(remaining.clone(), line, column);
+
         let consumed_len = remaining.len() - new_remaining.len();
         if consumed_len == 0 {
             panic!("Tokenizer got stuck at line {}, column {}", line, column);
         }
+
         let consumed = &remaining[..consumed_len];
-        
+
         for c in consumed.chars() {
             if c == '\n' {
                 line += 1;
-                column = 0;
+                column = 1;
+            } else {
+                column += 1;
             }
-            column += 1;
         }
 
-        remaining = new_remaining.clone();
-
+        remaining = new_remaining;
         tokens.push(token);
     }
 
