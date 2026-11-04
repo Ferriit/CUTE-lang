@@ -1,8 +1,8 @@
 use std::fs;
 
 mod lexer;
-
-const VERSION: &str = concat!("v", env!("CARGO_PKG_VERSION"));
+//                                                              May the cat rest in peace
+const VERSION: &str = concat!("v", env!("CARGO_PKG_VERSION"), "-Simson");
 const LICENSE: &str = env!("CARGO_PKG_LICENSE");
 const NAME: &str = "cutec";
 const TARGET: &str = env!("CUTE_TARGET");
@@ -39,7 +39,7 @@ fn print_version() {
 }
 
 fn print_help() {
-    println!("CUTE Compiler v{}", env!("CARGO_PKG_VERSION"));
+    println!("CUTE Compiler {}", VERSION);
     println!();
     println!("Usage:");
     println!("    cutec [options] <source.cute> [-- <cpp-compiler-arguments...>]");
