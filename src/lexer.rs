@@ -1,6 +1,7 @@
 use std::fmt;
 
 #[allow(dead_code)]
+#[derive(Clone, PartialEq)]
 pub enum Lexeme {
     KeyW(String),
     Iden(String),
@@ -24,6 +25,35 @@ pub enum Lexeme {
     RSquare,
 
     Eof,
+}
+
+impl Lexeme {
+    pub fn to_string_lit(&self) -> String {
+        match self {
+            Lexeme::KeyW(v) => v.clone(),
+            Lexeme::Iden(v) => v.clone(),
+            Lexeme::Op(v) => v.clone(),
+            Lexeme::Int(v) => v.to_string(),
+            Lexeme::Float(v) => format!("{:?}", v),
+            Lexeme::Char(v) => v.to_string(),
+            Lexeme::Bool(v) => if *v { "true".to_string() } else { "false".to_string() },
+            Lexeme::StringLit(v) => v.clone(),
+
+            Lexeme::Semicolon => ";".to_string(),
+            Lexeme::Colon => ":".to_string(),
+            Lexeme::Comma => ",".to_string(),
+            Lexeme::Dot => ".".to_string(),
+
+            Lexeme::LBrace => "{".to_string(),
+            Lexeme::RBrace => "}".to_string(),
+            Lexeme::LParen => "(".to_string(),
+            Lexeme::RParen => ")".to_string(),
+            Lexeme::LSquare => "[".to_string(),
+            Lexeme::RSquare => "]".to_string(),
+
+            Lexeme::Eof => "\0".to_string()
+        }
+    }
 }
 
 impl fmt::Display for Lexeme {
@@ -56,6 +86,7 @@ impl fmt::Display for Lexeme {
 }
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct Token {
     pub lex: Lexeme,
     pub line: usize,

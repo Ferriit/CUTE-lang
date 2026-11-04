@@ -142,9 +142,7 @@ fn main() {
         .expect("cutec: Failed to read file");
 
     let tokens = lexer::tokenize(code.clone());
-    for tok in tokens {
+    for tok in tokens.clone() {
         println!("{}:{}\t {}", tok.line, tok.column, tok.lex);
     }
-
-    println!("{}", lexer::clean_code(code.clone()));
 }
