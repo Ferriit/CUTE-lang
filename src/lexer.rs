@@ -1,6 +1,5 @@
 use std::fmt;
 
-
 #[allow(dead_code)]
 pub enum Lexeme {
     KeyW(String),
@@ -64,7 +63,7 @@ pub struct Token {
     pub width: usize
 }
 
-fn clean_code(code: String) -> String {
+pub fn clean_code(code: String) -> String {
     let mut commentless = String::new();
     let mut in_comment = false;
 
@@ -228,36 +227,39 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
     let equals_cont = [
         '+', '-', '*', '%', '<', '>', '=', '!'
     ];
+
     let mut tok_str = String::new();
     let mut chars = code.char_indices().peekable();
     let mut pos = 0;
 
     while let Some(c) = chars.next() {
-        pos = c.0 + c.1.len_utf8();
-
+        // WHITESPACE
         if c.1.is_ascii_whitespace() {
             if tok_str.is_empty() {
+                pos = c.0 + c.1.len_utf8();
                 continue;
             } else {
                 break;
             }
         }
+
         // STRING LITERAL
         if c.1 == '"' {
             tok_str.push(c.1);
+            pos = c.0 + c.1.len_utf8();
 
             while let Some(next) = chars.next() {
                 tok_str.push(next.1);
+                pos = next.0 + next.1.len_utf8();
 
-                // Handle escape sequences
                 if next.1 == '\\' {
                     if let Some(escaped) = chars.next() {
                         tok_str.push(escaped.1);
+                        pos = escaped.0 + escaped.1.len_utf8();
                     }
                     continue;
                 }
 
-                // End of string
                 if next.1 == '"' {
                     break;
                 }
@@ -269,11 +271,12 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
         // CHARACTER LITERAL
         if c.1 == '\'' {
             tok_str.push(c.1);
+            pos = c.0 + c.1.len_utf8();
 
             while let Some(next) = chars.next() {
                 tok_str.push(next.1);
+                pos = next.0 + next.1.len_utf8();
 
-                // Handle escape sequences
                 if next.1 == '\\' {
                     if let Some(escaped) = chars.next() {
                         tok_str.push(escaped.1);
@@ -282,7 +285,6 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
                     continue;
                 }
 
-                // End of character
                 if next.1 == '\'' {
                     break;
                 }
@@ -292,14 +294,18 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
         }
 
         // NORMAL CHARACTERS
-        if !delims.contains(&c.1) || (c.1 == '.' && tok_str.chars().all(|x| x.is_ascii_digit())) {
+        if !delims.contains(&c.1)
+            || (c.1 == '.' && tok_str.chars().all(|x| x.is_ascii_digit()))
+        {
             tok_str.push(c.1);
+            pos = c.0 + c.1.len_utf8();
             continue;
         }
 
         // FIRST DELIMITER
         if tok_str.is_empty() {
             tok_str.push(c.1);
+            pos = c.0 + c.1.len_utf8();
 
             // Determine which characters can follow this operator
             let continuations: &[char] = if c.1 == '=' {
@@ -326,7 +332,8 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
     }
 
     let tok_len = tok_str.len();
-    let tok: Token = Token {
+
+    let tok = Token {
         lex: tok_to_lexeme(tok_str),
         line,
         column,
@@ -334,6 +341,7 @@ fn add_token(code: String, line: usize, column: usize) -> (String, Token) {
     };
 
     let remaining = code[pos..].to_string();
+
     (remaining, tok)
 }
 
