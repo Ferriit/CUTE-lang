@@ -1,6 +1,7 @@
 use std::fs;
 
 mod lexer;
+mod parser;
 //                                                              May the cat rest in peace
 const VERSION: &str = concat!("v", env!("CARGO_PKG_VERSION"), "-Simson");
 const LICENSE: &str = env!("CARGO_PKG_LICENSE");
