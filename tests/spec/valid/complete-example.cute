@@ -1,0 +1,81 @@
+using <cstdint>
+using <iostream>
+using <string>
+using "../include/test.hpp"
+
+namespace game {
+    const title: string = "CUTE Adventure";
+
+    enum PlayerState {
+        Idle,
+        Running,
+        Finished
+    };
+
+    struct Point {
+        var x: f32 = 0.0;
+        var y: f32 = 0.0;
+
+        func move(dx: f32, dy: f32): void {
+            x += dx;
+            y += dy;
+            return;
+        }
+    };
+
+    class Entity {
+        public func update(): void {
+            return;
+        }
+    };
+
+    class Player inherits Entity {
+        private var health: i32 = 100;
+        private var position: Point;
+
+        Player() {
+        }
+
+        public func damage(amount: i32): void {
+            if (amount > 0) {
+                health -= amount;
+            }
+        }
+
+        public func get_health(): i32 {
+            return health;
+        }
+
+        public func move(dx: f32, dy: f32): void {
+            position.move(dx, dy);
+        }
+    };
+
+    func add(a: i32, b: i32): i32 {
+        return a + b;
+    }
+
+    func main(): i32 {
+        var player: Player = Player();
+        var score: i32 = add(20, 22);
+        var active: bool = true;
+
+        player.damage(10);
+
+        if (active && player.get_health() > 0) {
+            print(title);
+        } else {
+            print("Game over");
+        }
+
+        for (var index: i32 = 0; index < 3; index += 1) {
+            score += index;
+        }
+
+        while (active) {
+            active = false;
+        }
+
+        return score;
+    }
+};

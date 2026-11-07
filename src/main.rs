@@ -146,4 +146,6 @@ fn main() {
     for tok in tokens.clone() {
         println!("{}:{}\t {}", tok.line, tok.column, tok.lex);
     }
+
+    parser::parse(tokens);
 }

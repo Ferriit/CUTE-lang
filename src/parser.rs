@@ -261,3 +261,77 @@ pub enum IntegerPointerType {
     Iptr,
     Uptr,
 }
+
+fn parse_imports(tokens: Vec<Token>) -> Vec<Import> {
+    let mut curr_include: String = "".to_string();
+    let mut build_include: bool = false;
+
+    let mut includes: Vec<Import> = Vec::new();
+    
+    for tok in tokens {
+        match tok.lex {
+            Lexeme::KeyW(s) => {
+                if s == "using" {
+                    build_include = true;
+                }
+            },
+            Lexeme::Op(s) => {
+                if build_include {
+                    if s == "<" && curr_include.is_empty() {
+                        curr_include += s.as_str();
+                    }
+                    else if s == ">" {
+                        curr_include += s.as_str();
+                        build_include = false;
+
+                        includes.push(Import {
+                            path: curr_include.clone()
+                        });
+
+                        curr_include = "".to_string();
+                    }
+                    else if s == "<" && !curr_include.is_empty() {
+                        panic!(
+                            "{}:{} Invalid import statement. Expected '<' or \'\"\'. Got {}.", 
+                            tok.line, 
+                            tok.column,
+                            s
+                        );
+                    }
+                    else {
+                        curr_include += s.as_str();
+                    }
+                }
+            },
+            Lexeme::Iden(s) => {
+                curr_include += s.as_str();
+            },
+            Lexeme::StringLit(s) => {
+                if build_include {
+                    if curr_include.is_empty() {
+                        curr_include += s.as_str();
+                        build_include = false;
+                    }
+                    else {
+                        panic!(
+                            "{}:{} Invalid import statement. Expected '<' or \'\"\'. Got {}.", 
+                            tok.line, 
+                            tok.column,
+                            s.as_bytes()[0]
+                        );
+                    }
+                }
+            },
+            _ => {}
+        }
+    }
+
+    includes
+}
+
+pub fn parse(tokens: Vec<Token>) -> Program {
+    Program {
+        imports: parse_imports(tokens),
+        declarations: Vec::new()
+    }
+}
