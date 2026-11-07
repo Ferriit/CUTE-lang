@@ -4,7 +4,7 @@ namespace math {
     }
 
     func log_result(value: i32): void {
-        print(value);
+        std.println(value);
         return;
     }
 };

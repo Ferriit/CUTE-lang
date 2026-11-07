@@ -267,15 +267,30 @@ fn parse_imports(tokens: Vec<Token>) -> Vec<Import> {
     let mut build_include: bool = false;
 
     let mut includes: Vec<Import> = Vec::new();
+    let mut expect_semicolon: bool = false;
     
     for tok in tokens {
         match tok.lex {
             Lexeme::KeyW(s) => {
+                if expect_semicolon {
+                    panic!(
+                        "{}:{} Expected semicolon.",
+                        tok.line,
+                        tok.column
+                    );
+                }
                 if s == "using" {
                     build_include = true;
                 }
             },
             Lexeme::Op(s) => {
+                if expect_semicolon {
+                    panic!(
+                        "{}:{} Expected semicolon.",
+                        tok.line,
+                        tok.column
+                    );
+                }
                 if build_include {
                     if s == "<" && curr_include.is_empty() {
                         curr_include += s.as_str();
@@ -289,6 +304,7 @@ fn parse_imports(tokens: Vec<Token>) -> Vec<Import> {
                         });
 
                         curr_include = "".to_string();
+                        expect_semicolon = true;
                     }
                     else if s == "<" && !curr_include.is_empty() {
                         panic!(
@@ -304,13 +320,32 @@ fn parse_imports(tokens: Vec<Token>) -> Vec<Import> {
                 }
             },
             Lexeme::Iden(s) => {
+                if expect_semicolon {
+                    panic!(
+                        "{}:{} Expected semicolon.",
+                        tok.line,
+                        tok.column
+                    );
+                }
                 curr_include += s.as_str();
             },
             Lexeme::StringLit(s) => {
+                if expect_semicolon {
+                    panic!(
+                        "{}:{} Expected semicolon.",
+                        tok.line,
+                        tok.column
+                    );
+                }
                 if build_include {
                     if curr_include.is_empty() {
                         curr_include += s.as_str();
                         build_include = false;
+
+                        includes.push(Import {
+                            path: curr_include.clone()
+                        });
+                        expect_semicolon = true;
                     }
                     else {
                         panic!(
@@ -322,7 +357,20 @@ fn parse_imports(tokens: Vec<Token>) -> Vec<Import> {
                     }
                 }
             },
-            _ => {}
+            Lexeme::Semicolon => {
+                if expect_semicolon {
+                    expect_semicolon = false;
+                }
+            },
+            _ => {
+                if expect_semicolon {
+                    panic!(
+                        "{}:{} Expected semicolon.",
+                        tok.line,
+                        tok.column
+                    );
+                }
+            }
         }
     }
 

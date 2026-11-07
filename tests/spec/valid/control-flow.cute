@@ -24,7 +24,7 @@ func loops(limit: i32): void {
     }
 
     run {
-        print("running");
+        std.println("running");
     }
 
     jump done;

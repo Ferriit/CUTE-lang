@@ -803,7 +803,7 @@ Imports are handled through the `using` keyword and a name that works the same a
 Example:
 
 ```cute
-using <iostream>
+using <iostream>;
 ```
 
 The build system handles translation into C++ includes and dependencies.

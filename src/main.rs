@@ -147,5 +147,9 @@ fn main() {
         println!("{}:{}\t {}", tok.line, tok.column, tok.lex);
     }
 
-    parser::parse(tokens);
+    let ast: parser::Program = parser::parse(tokens);
+    println!("\nImports:");
+    for import in ast.imports {
+        println!("{}", import.path);
+    }
 }
